@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <parent>
+        <groupId>org.jvnet.hudson.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.366</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>boundary-annotations</artifactId>
+    <packaging>hpi</packaging>
+    <version>0.1</version>
+    <name>Jenkins Boundary Annotations Plugin</name>
+    <description>Creates Boundary Annotations for your build jobs</description>
+    <url>http://boundary.com</url>
+	<scm>
+	    <connection>scm:git:git://github.com/boundary/jenkins-boundary-annotations-plugin.git</connection>
+	    <developerConnection>scm:git:git@github.com:boundary/jenkins-boundary-annotations-plugin</developerConnection>
+	    <url>http://github.com/boundary/jenkins-boundary-annotations-plugin</url>
+	</scm>
+    <licenses>
+        <license>
+            <name>Apache 2 license</name>
+            <comments>All source code is under the Apache 2 license.</comments>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava-base</artifactId>
+            <version>r03</version>
+        </dependency>
+    </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-release-plugin</artifactId>
+		        <version>2.0</version>
+		        <dependencies>
+		          <dependency>
+		            <groupId>org.apache.maven.scm</groupId>
+		            <artifactId>maven-scm-provider-gitexe</artifactId>
+		            <version>1.3</version>
+		          </dependency>
+		        </dependencies>
+		      </plugin>
+		</plugins>
+		<extensions>
+		      <extension>
+		        <groupId>org.jvnet.wagon-svn</groupId>
+		        <artifactId>wagon-svn</artifactId>
+		        <version>1.9</version>
+		      </extension>
+		</extensions>
+	</build>
+    <developers>
+        <developer>
+            <id>joewilliams</id>
+            <name>Joe Williams</name>
+            <email>j@boundary.com</email>
+        </developer>
+    </developers>
+</project>
