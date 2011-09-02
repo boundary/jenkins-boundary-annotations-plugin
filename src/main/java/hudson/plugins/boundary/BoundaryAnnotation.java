@@ -24,6 +24,7 @@ public class BoundaryAnnotation extends Notifier {
 
     public final String serviceUser;
     public final String apiToken;
+    private String json;
     private transient Boundary boundary;
 
     @DataBoundConstructor
@@ -47,7 +48,8 @@ public class BoundaryAnnotation extends Notifier {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
         initializeBoundary();
-        boundary.post(build.getProject().getName(), build.getResult().toString(), Integer.toString(build.getNumber()), listener);
+        json = boundary.annotation();
+        boundary.post(json, listener);
         return true;
     }
 

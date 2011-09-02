@@ -22,6 +22,12 @@
 	    <developerConnection>scm:git:git@github.com:boundary/jenkins-boundary-annotations-plugin</developerConnection>
 	    <url>http://github.com/boundary/jenkins-boundary-annotations-plugin</url>
 	</scm>
+	<repositories>
+  		<repository>
+   			<id>codehaus-snapshots</id>
+   			<url>http://snapshots.repository.codehaus.org</url>
+  		</repository>
+ 	</repositories>
     <licenses>
         <license>
             <name>Apache 2 license</name>
@@ -39,6 +45,11 @@
             <artifactId>guava-base</artifactId>
             <version>r03</version>
         </dependency>
+		<dependency>
+		   <groupId>org.codehaus.jackson</groupId>
+		   <artifactId>jackson-mapper-asl</artifactId>
+		   <version>1.8.0-SNAPSHOT</version>
+		</dependency>
     </dependencies>
 	<build>
 		<plugins>
