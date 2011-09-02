@@ -1,6 +1,10 @@
 package hudson.plugins.boundary;
 
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.Hudson;
+
+import hudson.plugins.git.util.BuildData;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -31,52 +35,41 @@ public class Boundary
         this.token = token;
     }
     
-    public String annotation()
+    public void annotate(AbstractBuild<?, ?> build)
     {
         
         HashMap<String, Object> annot = new HashMap<String, Object>();
 
-        annot.put("type", "jenkins build");
-        annot.put("subtype", "test");
-        annot.put("creation_time", 1308336162);
-        annot.put("start_time", 1308336162);
-        annot.put("end_time", 1308336162);
+        annot.put("type", "build");
+        annot.put("subtype", build.getProject().getName());
 
         ArrayList<Map<String, String>> linkList = new ArrayList<Map<String, String>>();
 
         Map<String, String> linkOne = new HashMap<String, String>();
-        linkOne.put("rel", "self");
-        linkOne.put("href", "https://api.boundary.com/annotations/9af9c92d72c9974d");
-
-        Map<String, String> linkTwo = new HashMap<String, String>();
-        linkTwo.put("rel", "origin");
-        linkTwo.put("href", "http://hudson.boundary.com:8080/");
-        linkTwo.put("note", "hudson");
-
-        Map<String, String> linkThree = new HashMap<String, String>();
-        linkThree.put("rel", "origin");
-        linkThree.put("href", "http://hudson.boundary.com:8080/");
-        linkThree.put("note", "hudson");
-
-        Map<String, String> linkFour = new HashMap<String, String>();
-        linkFour.put("rel", "version");
-        linkFour.put("href", "https://git.cid1.boundary.com/metermgr/tree/350bdc15236d3829ef3985535c650a6c64ddce80");
-        linkFour.put("note", "350bdc15236d3829ef3985535c650a6c64ddce80");
-
-        Map<String, String> linkFive = new HashMap<String, String>();
-        linkFive.put("rel", "build");
-        linkFive.put("href", "http://hudson.boundary.com:8080/job/metermgr/210/");
-        linkFive.put("note", "210");
-
-
+        linkOne.put("rel", "origin");
+        linkOne.put("href", Hudson.getInstance().getRootUrl());
+        linkOne.put("note", "jenkins");
         linkList.add(linkOne);
+        
+        Map<String, String> linkTwo = new HashMap<String, String>();
+        linkTwo.put("rel", "build");
+        linkTwo.put("href", Hudson.getInstance().getRootUrl() + build.getUrl());
+        linkTwo.put("note", build.getDisplayName());
         linkList.add(linkTwo);
+        
+        Map<String, String> linkThree = new HashMap<String, String>();
+        linkThree.put("rel", "version");
+        
+        BuildData data = build.getAction(BuildData.class);
+        if (data != null) {
+            String rev = data.getLastBuiltRevision().getSha1String();            
+            linkThree.put("note", rev);
+        }
+        
         linkList.add(linkThree);
-        linkList.add(linkFour);
-        linkList.add(linkFive);
-
+        
         annot.put("links", linkList);
-        annot.put("tags", Arrays.asList(new String[]{"metermgr", "deploy", "erlang", "cid1"}));
+        annot.put("tags", Arrays.asList(new String[]{build.getProject().getName(), "build", build.getResult().toString()}));
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonOutput = new String();
@@ -89,18 +82,12 @@ public class Boundary
             System.out.println("json error: " + ioe);
         }
         
-        return jsonOutput;
-    }
-
-    public void post( String json, BuildListener listener )
-              throws IOException
-    {
         createClient(  );
 
         PostMethod post = new PostMethod( BOUNDARY_URI );
         
         post.addRequestHeader("Content-Type", "application/json");   
-        post.setRequestBody( json );
+        post.setRequestBody( jsonOutput );
 
         try
             {
@@ -109,7 +96,7 @@ public class Boundary
             
         catch ( Exception e )
             {
-                e.printStackTrace( listener.error( "Unable to send message to Boundary API") );
+                System.out.println( "Unable to send message to Boundary API: \n" + e);
             } 
         
         finally

@@ -48,8 +48,7 @@ public class BoundaryAnnotation extends Notifier {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
         initializeBoundary();
-        json = boundary.annotation();
-        boundary.post(json, listener);
+        boundary.annotate(build);
         return true;
     }
 
