@@ -36,8 +36,8 @@ public class Boundary
         
         HashMap<String, Object> annot = new HashMap<String, Object>();
 
-        annot.put("type", "deploy");
-        annot.put("create_org", "abc123");
+        annot.put("type", "jenkins build");
+        annot.put("subtype", "test");
         annot.put("creation_time", 1308336162);
         annot.put("start_time", 1308336162);
         annot.put("end_time", 1308336162);
