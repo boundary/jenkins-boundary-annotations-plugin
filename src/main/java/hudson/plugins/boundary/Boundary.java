@@ -6,6 +6,9 @@ import hudson.model.Hudson;
 
 import hudson.plugins.git.util.BuildData;
 
+import com.coravy.hudson.plugins.github.GithubUrl;
+import com.coravy.hudson.plugins.github.GithubProjectProperty;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
@@ -60,12 +63,14 @@ public class Boundary
         Map<String, String> linkThree = new HashMap<String, String>();
         linkThree.put("rel", "version");
         
+        linkThree.put("href", ""); // get github or gitweb link
+        
         BuildData data = build.getAction(BuildData.class);
         if (data != null) {
             String rev = data.getLastBuiltRevision().getSha1String();            
             linkThree.put("note", rev);
         }
-        
+                
         linkList.add(linkThree);
         
         annot.put("links", linkList);
