@@ -55,11 +55,6 @@
 			<artifactId>git</artifactId>
 			<version>1.1.12</version>
 		</dependency>
-		<dependency>
-			<groupId>com.coravy.hudson.plugins.github</groupId>
-			<artifactId>github</artifactId>
-			<version>0.7</version>
-		</dependency>
     </dependencies>
 	<build>
 		<plugins>

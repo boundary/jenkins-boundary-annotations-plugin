@@ -4,10 +4,13 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.browser.GitRepositoryBrowser;
+import hudson.plugins.git.browser.GitWeb;
+import hudson.plugins.git.browser.GithubWeb;
+import hudson.plugins.git.browser.GitoriousWeb;
 import hudson.plugins.git.util.BuildData;
-
-import com.coravy.hudson.plugins.github.GithubUrl;
-import com.coravy.hudson.plugins.github.GithubProjectProperty;
+import hudson.scm.SCM;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -63,14 +66,37 @@ public class Boundary
         Map<String, String> linkThree = new HashMap<String, String>();
         linkThree.put("rel", "version");
         
-        linkThree.put("href", ""); // get github or gitweb link
-        
         BuildData data = build.getAction(BuildData.class);
         if (data != null) {
-            String rev = data.getLastBuiltRevision().getSha1String();            
+            // Grab the SHA1
+        	String rev = data.getLastBuiltRevision().getSha1String();
             linkThree.put("note", rev);
+            
+            // Now, attempt to build a URL for this changeset.
+            String url = null;
+            SCM scm = build.getProject().getScm();
+            if (scm instanceof GitSCM) {
+            	GitRepositoryBrowser browser = ((GitSCM) scm).getBrowser();
+            	if (browser instanceof GitWeb) {
+            		String baseURL = ((GitWeb) browser).getUrl().toString();
+            		url = baseURL + "?a=commit&h=" + rev;
+            	} else if (browser instanceof GithubWeb) {
+            		String baseURL  = ((GithubWeb) browser).getUrl().toString();
+            		url = baseURL + "commit/" + rev;
+            	} else if (browser instanceof GitoriousWeb) {
+            		String baseURL = ((GitoriousWeb) browser).getUrl().toString();
+            		url = baseURL + "commit/" + rev;
+            	}
+            }
+            
+            if (url != null) {
+            	linkThree.put("href", url);
+            } else {
+            	linkThree.put("href", "http://www.sadtrombone.com/");
+            }
+            
         }
-                
+        
         linkList.add(linkThree);
         
         annot.put("links", linkList);
