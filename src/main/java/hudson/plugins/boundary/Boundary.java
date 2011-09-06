@@ -65,6 +65,9 @@ public class Boundary
         
         BuildData data = build.getAction(BuildData.class);
         if (data != null) {
+            
+            // Build the commit url and link if we can
+            
             Map<String, String> linkThree = new HashMap<String, String>();
             linkThree.put("rel", "version");
             
@@ -72,13 +75,27 @@ public class Boundary
         	String rev = data.getLastBuiltRevision().getSha1String();
             linkThree.put("note", rev);
             
-            String url = buildGitUrl(rev, build);
-            
-            if (url != null) {
+            String commitUrl = buildGitCommitUrl(rev, build);
+
+            if (commitUrl != null) {
                 // If the url exists add it to the hash and add
                 // the hash to the list of links
-            	linkThree.put("href", url);
+            	linkThree.put("href", commitUrl);
             	linkList.add(linkThree);
+            }
+            
+            // Build the repo url and link if we can
+            
+            Map<String, String> linkFour = new HashMap<String, String>();
+            linkFour.put("rel", "repo");
+            
+            String repoUrl = buildGitRepoUrl(build);
+            
+            if (repoUrl != null) {
+                // If the url exists add it to the hash and add
+                // the hash to the list of links
+            	linkFour.put("href", repoUrl);
+            	linkList.add(linkFour);
             }
         }
         
@@ -119,7 +136,28 @@ public class Boundary
             }
     }
     
-    private String buildGitUrl(String rev, AbstractBuild<?, ?> build) {
+    private String buildGitRepoUrl(AbstractBuild<?, ?> build) {
+        // Attempt to build a URL for this repo.
+        String url = null;
+        try {
+            SCM scm = build.getProject().getScm();
+            if (scm instanceof GitSCM) {
+            	GitRepositoryBrowser browser = ((GitSCM) scm).getBrowser();
+            	if (browser instanceof GitWeb) {
+            		url = ((GitWeb) browser).getUrl().toString();
+            	} else if (browser instanceof GithubWeb) {
+            		url  = ((GithubWeb) browser).getUrl().toString();
+            	}
+            }
+        }    
+        catch (Throwable t) {
+            System.out.println("No git repo URL available.");
+        }
+        
+        return url;
+    }
+    
+    private String buildGitCommitUrl(String rev, AbstractBuild<?, ?> build) {
         // Attempt to build a URL for this changeset.
         String url = null;
         try {
