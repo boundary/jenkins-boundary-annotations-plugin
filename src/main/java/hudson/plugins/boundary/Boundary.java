@@ -75,12 +75,11 @@ public class Boundary
             String url = buildGitUrl(rev, build);
             
             if (url != null) {
+                // If the url exists add it to the hash and add
+                // the hash to the list of links
             	linkThree.put("href", url);
-            } else {
-            	linkThree.put("href", "http://www.sadtrombone.com/");
+            	linkList.add(linkThree);
             }
-         
-            linkList.add(linkThree);   
         }
         
         annot.put("links", linkList);
@@ -121,7 +120,7 @@ public class Boundary
     }
     
     private String buildGitUrl(String rev, AbstractBuild<?, ?> build) {
-        // Now, attempt to build a URL for this changeset.
+        // Attempt to build a URL for this changeset.
         String url = null;
         try {
             SCM scm = build.getProject().getScm();
@@ -137,7 +136,7 @@ public class Boundary
             }
         }    
         catch (Throwable t) {
-            t.printStackTrace();
+            System.out.println("No git repo URL available.");
         }
         
         return url;
