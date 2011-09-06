@@ -63,41 +63,25 @@ public class Boundary
         linkTwo.put("note", build.getDisplayName());
         linkList.add(linkTwo);
         
-        Map<String, String> linkThree = new HashMap<String, String>();
-        linkThree.put("rel", "version");
-        
         BuildData data = build.getAction(BuildData.class);
         if (data != null) {
+            Map<String, String> linkThree = new HashMap<String, String>();
+            linkThree.put("rel", "version");
+            
             // Grab the SHA1
         	String rev = data.getLastBuiltRevision().getSha1String();
             linkThree.put("note", rev);
             
-            // Now, attempt to build a URL for this changeset.
-            String url = null;
-            SCM scm = build.getProject().getScm();
-            if (scm instanceof GitSCM) {
-            	GitRepositoryBrowser browser = ((GitSCM) scm).getBrowser();
-            	if (browser instanceof GitWeb) {
-            		String baseURL = ((GitWeb) browser).getUrl().toString();
-            		url = baseURL + "?a=commit&h=" + rev;
-            	} else if (browser instanceof GithubWeb) {
-            		String baseURL  = ((GithubWeb) browser).getUrl().toString();
-            		url = baseURL + "commit/" + rev;
-            	} else if (browser instanceof GitoriousWeb) {
-            		String baseURL = ((GitoriousWeb) browser).getUrl().toString();
-            		url = baseURL + "commit/" + rev;
-            	}
-            }
+            String url = buildGitUrl(rev, build);
             
             if (url != null) {
             	linkThree.put("href", url);
             } else {
             	linkThree.put("href", "http://www.sadtrombone.com/");
             }
-            
+         
+            linkList.add(linkThree);   
         }
-        
-        linkList.add(linkThree);
         
         annot.put("links", linkList);
         annot.put("tags", Arrays.asList(new String[]{build.getProject().getName(), "build", build.getResult().toString()}));
@@ -134,6 +118,29 @@ public class Boundary
             {
                 post.releaseConnection(  );
             }
+    }
+    
+    private String buildGitUrl(String rev, AbstractBuild<?, ?> build) {
+        // Now, attempt to build a URL for this changeset.
+        String url = null;
+        try {
+            SCM scm = build.getProject().getScm();
+            if (scm instanceof GitSCM) {
+            	GitRepositoryBrowser browser = ((GitSCM) scm).getBrowser();
+            	if (browser instanceof GitWeb) {
+            		String baseURL = ((GitWeb) browser).getUrl().toString();
+            		url = baseURL + "?a=commit&h=" + rev;
+            	} else if (browser instanceof GithubWeb) {
+            		String baseURL  = ((GithubWeb) browser).getUrl().toString();
+            		url = baseURL + "commit/" + rev;
+            	}
+            }
+        }    
+        catch (Throwable t) {
+            t.printStackTrace();
+        }
+        
+        return url;
     }
 
     private void createClient(  )
